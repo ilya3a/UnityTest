@@ -14,6 +14,21 @@ android {
         minSdk = 28
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildFeatures {
+            buildConfig = true
+        }
+
+        buildConfigField(
+            "String",
+            "UPLOAD_BASE_URL",
+            "\"${project.findProperty("uploadBaseURL")}\""
+        )
+        buildConfigField(
+            "String",
+            "UPLOAD_END_POINT",
+            "\"${project.findProperty("uploadEndPoint")}\""
+        )
     }
 
     buildTypes {
