@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "DBflusher"
 include(":app")
- 
+include(":ConcurrentEventTracker")

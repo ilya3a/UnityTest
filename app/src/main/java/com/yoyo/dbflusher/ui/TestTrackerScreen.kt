@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.yoyo.dbflusher.tracker.AnalyticsTracker
+import com.yoyo.concurrenteventtracker.tracker.AnalyticsTracker
 
 
 @Composable
@@ -64,7 +64,7 @@ fun TestTrackerScreen(
         Button(
             onClick = {
                 try {
-                    tracker.logEvent(eventName, params)
+                    tracker.logEvent(eventName)
                     counter++
                     message = "Event logged successfully"
                 }catch (t:Throwable){
