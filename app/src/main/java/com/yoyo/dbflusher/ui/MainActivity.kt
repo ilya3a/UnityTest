@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DBflusherTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    TestTrackerScreen(analyticsTracker)
+                    TestTrackerScreen(analyticsTracker,)
                 }
             }
         }

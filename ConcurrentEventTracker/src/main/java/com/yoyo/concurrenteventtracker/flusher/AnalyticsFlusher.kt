@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -16,40 +17,38 @@ import javax.inject.Singleton
 @Singleton
 class AnalyticsFlusher @Inject constructor(
     private val repository: AnalyticsRepository,
-    private val api: AnalyticsApi,
-    private val policy: FlushPolicy
+    private val api: AnalyticsApi
 ) {
 
     val TAG = "AnalyticsFlusher"
-
     private val flushMutex = Mutex()
-    private var flushJob: Job? = null
 
     /**
      * Flushes events to the server, deletes them if sent successfully.
      */
-    suspend fun flush() {
-        Log.d(TAG,"Flushing events...${Thread.currentThread().name}")
+    suspend fun sendEvents() {
+        Log.d(TAG, "Flushing events...${Thread.currentThread().name}")
         flushMutex.withLock {
-            val currentCount = repository.getEventCount()
-            if(currentCount >= policy.maxEvents){
-                Log.d(TAG,"Flushing events in mutex ${Thread.currentThread().name}")
-                val events: List<AnalyticsEvent> = repository.getEventsForFlush(policy.maxFlushBatchSize)
-                if (events.isEmpty()) return
-
-                val success = api.send(events)
-                if (success) {
-                    repository.deleteEventsByIds(events.map { it.id })
-                } else {
-                    // Log failure and retry later (simple retry mechanism)
-                    Log.d(TAG,"Flush failed. Will retry later.")
-                    // Optional: delay or schedule retry with WorkManager
-                }
-                Log.d(TAG,"Flushing events done ${Thread.currentThread().name}")
-            }else{
-                Log.d(TAG,"Flushing events  skipped ${currentCount}${Thread.currentThread().name}")
+            val events: List<AnalyticsEvent> = repository.getEventsForFlush()
+            if (events.isEmpty()) {
+                Log.d(TAG, "No events to flush")
+                return
             }
+
+            val success = api.send(events)
+            if (success) {
+                repository.deleteEvents()
+            } else {
+                // Log failure and retry later (simple retry mechanism)
+                Log.d(TAG, "Flush failed. Will retry later.")
+                // Optional: delay or schedule retry with WorkManager
+            }
+            Log.d(TAG, "Flushing events done ${Thread.currentThread().name}")
         }
+    }
+
+    suspend fun flush(eventBuffer: MutableList<AnalyticsEvent>) {
+        repository.logEvents(eventBuffer)
     }
 
 }

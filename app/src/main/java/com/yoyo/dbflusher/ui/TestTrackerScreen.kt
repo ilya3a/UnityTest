@@ -12,7 +12,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,19 +19,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.yoyo.concurrenteventtracker.data.db.AnalyticsEvent
 import com.yoyo.concurrenteventtracker.tracker.AnalyticsTracker
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun TestTrackerScreen(
-    tracker: AnalyticsTracker
+    tracker: AnalyticsTracker,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    var eventName by remember { mutableStateOf("") }
-    var params by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var counter by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -46,33 +45,15 @@ fun TestTrackerScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = eventName,
-            onValueChange = { eventName = it },
-            label = { Text("Event Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = params,
-            onValueChange = { params = it },
-            label = { Text("Parameters") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
         Button(
             onClick = {
                 try {
-                    tracker.logEvent(eventName)
-                    counter++
+                    tracker.trackEvent(AnalyticsEvent(name = "TEST_EVENT"))
                     message = "Event logged successfully"
-                }catch (t:Throwable){
+                } catch (t: Throwable) {
                     message = t.message.toString()
                 }
-            },
-            enabled = eventName.isNotBlank() && params.isNotBlank(),
-        ) {
+            }) {
             Text("Log Event")
         }
 
@@ -82,8 +63,35 @@ fun TestTrackerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "counter = ${counter}")
 
+        Button(
+            onClick = {
+                try {
+                    coroutineScope.launch(IO) {
+                        tracker.uploadFlushedEvents()
+                    }
+
+
+                } catch (t: Throwable) {
+                    message = t.message.toString()
+                }
+            }
+        ) {
+            Text("upload Events")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                try {
+                    tracker.shutdown()
+                } catch (t: Throwable) {
+                    message = t.message.toString()
+                }
+            }
+        ) {
+            Text("ShutDown")
+        }
     }
 
 }

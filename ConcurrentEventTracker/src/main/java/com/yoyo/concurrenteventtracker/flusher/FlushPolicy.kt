@@ -7,6 +7,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class FlushPolicy(
-    val maxEvents: Int = 20, // Trigger flush when this number of events is reached
-    val maxFlushBatchSize: Int = 20 // How many events to send at once
+    val maxEvents: Int = 5, // Trigger flush when this number of events is reached
+    val maxFlushBatchSize: Int = 20, // How many events to send at once
+    val timerToFlush: Long = 1000 * 10 // How long to wait before flushing
 )

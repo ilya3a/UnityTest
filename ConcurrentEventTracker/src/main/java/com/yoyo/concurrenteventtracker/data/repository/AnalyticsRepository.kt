@@ -21,34 +21,28 @@ class AnalyticsRepository @Inject constructor(
     /**
      * Inserts a new event into the local database.
      */
-    suspend fun logEvent(event: AnalyticsEvent) {
+    suspend fun logEvents(events: List<AnalyticsEvent>) {
         mutex.withLock {
-            dao.insert(event)
+            dao.insert(events)
         }
     }
 
     /**
      * Retrieves the oldest events up to the specified limit.
      */
-    suspend fun getEventsForFlush(limit: Int): List<AnalyticsEvent> {
+    suspend fun getEventsForFlush(): List<AnalyticsEvent> {
         return mutex.withLock {
-            dao.getOldestEvents(limit)
+            dao.getEvents()
         }
     }
 
     /**
      * Deletes events by their IDs after successful send.
      */
-    suspend fun deleteEventsByIds(ids: List<Long>) {
+    suspend fun deleteEvents() {
         mutex.withLock {
-            dao.deleteEventsByIds(ids)
+            dao.delete()
         }
     }
 
-    /**
-     * Retrieves the count of events in the local database.
-     */
-    suspend fun getEventCount(): Int {
-        return dao.getEventCount()
-    }
 }

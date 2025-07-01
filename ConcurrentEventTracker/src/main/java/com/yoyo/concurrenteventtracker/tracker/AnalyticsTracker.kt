@@ -1,13 +1,16 @@
 package com.yoyo.concurrenteventtracker.tracker
 
-import android.content.Context
+import android.util.Log
 import com.yoyo.concurrenteventtracker.data.db.AnalyticsEvent
-import com.yoyo.concurrenteventtracker.data.repository.AnalyticsRepository
 import com.yoyo.concurrenteventtracker.di.ApplicationScope
 import com.yoyo.concurrenteventtracker.flusher.AnalyticsFlusher
-import com.yoyo.concurrenteventtracker.worker.FlushWorker
+import com.yoyo.concurrenteventtracker.flusher.FlushPolicy
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,45 +20,67 @@ import javax.inject.Singleton
  */
 @Singleton
 class AnalyticsTracker @Inject constructor(
-    private val repository: AnalyticsRepository,
     private val flusher: AnalyticsFlusher,
-    @ApplicationScope applicationScope: CoroutineScope
-) : ConcurrentEventTracker{
+    private val flushPolicy: FlushPolicy,
+    @param:ApplicationScope private val scope: CoroutineScope
+) : ConcurrentEventTracker {
 
-    val scope = applicationScope
+    private var eventBuffer = mutableListOf<AnalyticsEvent>()
+    private val trackerMutex = Mutex()
+    private var periodicFlushJob: Job? = null
 
-    /**
-     * Log an analytics event with optional attributes.
-     * @param name Event name (e.g. "item_clicked")
-     * @param params Optional attributes associated with the event (e.g. "item_id:123")
-     */
-     fun logEvent(name: String, metadata: Map<String, String>? = null) {
-         scope.launch {
-             val event = AnalyticsEvent(
-                 name = name,
-             )
-             repository.logEvent(event)
-             flusher.flush()
-         }
-
+    init {
+        startPeriodicFlush()
     }
 
-    /**
-     * Schedule a worker to flush events.
-     */
-    fun startWorker(context: Context) {
-        FlushWorker.scheduleFlushWorker(context)
+    private fun startPeriodicFlush() {
+        periodicFlushJob?.cancel() // in case already running
+        periodicFlushJob = scope.launch {
+            while (true) {
+                delay(flushPolicy.timerToFlush) // wait 10 seconds
+                Log.d("AnalyticsTracker", "Periodic flush check triggered")
+                trackerMutex.withLock {
+                    if (eventBuffer.isNotEmpty()) {
+                        flusher.flush(eventBuffer)
+                        eventBuffer.clear()
+                    }
+                }
+            }
+        }
     }
 
-    override fun trackEvent(event: AnalyticsEvent){
 
+    override fun trackEvent(event: AnalyticsEvent) {
+        scope.launch {
+            trackerMutex.withLock {
+                if (periodicFlushJob == null || !periodicFlushJob!!.isActive) {
+                    startPeriodicFlush()
+                }
+                eventBuffer.add(event)
+                if (eventBuffer.size >= flushPolicy.maxEvents) {
+                    flusher.flush(eventBuffer)
+                    eventBuffer.clear()
+                }
+            }
+        }
     }
-    override fun shutdown(){
-        // Gracefully cancels background work
+
+
+    override fun shutdown() {
+        scope.launch {
+            trackerMutex.withLock {
+                periodicFlushJob?.cancel()
+                Log.d("AnalyticsTracker", "Shutting down")
+                if (eventBuffer.isNotEmpty()) {
+                    flusher.flush(eventBuffer)
+                    eventBuffer.clear()
+                }
+            }
+        }
     }
 
-    override suspend fun uploadFlushedEvents(){
-
+    override suspend fun uploadFlushedEvents() {
+        flusher.sendEvents()
     }
 
 }

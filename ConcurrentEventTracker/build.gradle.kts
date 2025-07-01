@@ -55,4 +55,10 @@ dependencies {
     //work manager
     implementation(libs.androidx.work.runtime.ktx)
 
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
+
 }
