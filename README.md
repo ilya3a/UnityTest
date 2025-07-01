@@ -30,7 +30,7 @@ A lightweight event tracking library built with Kotlin, Room, Retrofit, and Hilt
 
 ---
 
-###TODO:
+### TODO:
 - Allow configuration of `FlushPolicy` values from the application layer.
 - build test units
 
