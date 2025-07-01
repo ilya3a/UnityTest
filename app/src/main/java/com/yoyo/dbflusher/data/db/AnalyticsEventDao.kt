@@ -16,5 +16,5 @@ interface AnalyticsEventDao {
     suspend fun deleteEventsByIds(ids: List<Long>)
 
     @Query("SELECT COUNT(*) FROM analytics_events")
-    fun observeEventCount(): Flow<Int>
+    fun getEventCount(): Int
 }

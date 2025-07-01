@@ -24,9 +24,6 @@ class AnalyticsTracker @Inject constructor(
 ) {
 
     val scope = applicationScope
-    init {
-        flusher.startObserving(applicationScope)
-    }
 
     /**
      * Log an analytics event with optional attributes.
@@ -40,6 +37,7 @@ class AnalyticsTracker @Inject constructor(
                  params = params
              )
              repository.logEvent(event)
+             flusher.flush()
          }
 
     }

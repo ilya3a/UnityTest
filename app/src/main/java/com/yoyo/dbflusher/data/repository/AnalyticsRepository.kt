@@ -16,7 +16,6 @@ import javax.inject.Singleton
 class AnalyticsRepository @Inject constructor(
     private val dao: AnalyticsEventDao
 ) {
-
     // Mutex to prevent concurrent write/read/flush operations
     private val mutex = Mutex()
 
@@ -48,10 +47,9 @@ class AnalyticsRepository @Inject constructor(
     }
 
     /**
-     * Observes the current number of events stored, as a Flow.
-     * Useful for triggering automatic flushes when count exceeds a threshold.
+     * Retrieves the count of events in the local database.
      */
-    fun observeEventCount(): Flow<Int> {
-        return dao.observeEventCount()
+    fun getEventCount(): Int {
+        return dao.getEventCount()
     }
 }
