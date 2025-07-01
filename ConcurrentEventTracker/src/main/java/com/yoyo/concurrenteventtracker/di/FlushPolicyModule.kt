@@ -12,7 +12,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object FlushPolicyModule {
+ object FlushPolicyModule {
 
     @Provides
     @Singleton

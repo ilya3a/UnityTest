@@ -1,5 +1,6 @@
 package com.yoyo.concurrenteventtracker.network
 
+import com.yoyo.concurrenteventtracker.network.model.UploadResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Multipart
@@ -13,5 +14,5 @@ interface AnalyticsUploadApi {
     @POST("files/upload ")
     suspend fun uploadCompressedFile(
         @Part file: MultipartBody.Part
-    ): Response<Unit>
+    ): Response<UploadResponse>
 }

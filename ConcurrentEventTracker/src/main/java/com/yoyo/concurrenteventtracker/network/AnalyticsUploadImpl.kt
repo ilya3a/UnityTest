@@ -51,11 +51,12 @@ class AnalyticsUploadImpl @Inject constructor(
             // 5. Upload via API
             val response = api.uploadCompressedFile(filePart)
             Log.d("Upload", "Response code: ${response.code()}")
+            Log.d("Upload", "Response body: ${response.body().toString()}")
             val success = response.isSuccessful
 
 
             if (success) {
-                Log.e("Upload", "Response code: ${response.code()}")
+                Log.d("Upload", "Response code: ${response.code()}")
                 // 6. Cleanup
                 jsonFile.delete()
                 gzipFile.delete()
