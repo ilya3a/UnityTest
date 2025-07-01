@@ -33,6 +33,9 @@ class AnalyticsTracker @Inject constructor(
         startPeriodicFlush()
     }
 
+    /**
+     * Starts a periodic flush job.
+     */
     private fun startPeriodicFlush() {
         periodicFlushJob?.cancel() // in case already running
         periodicFlushJob = scope.launch {
@@ -41,6 +44,7 @@ class AnalyticsTracker @Inject constructor(
                 Log.d("AnalyticsTracker", "Periodic flush check triggered")
                 trackerMutex.withLock {
                     if (eventBuffer.isNotEmpty()) {
+                        Log.d("AnalyticsTracker", "startPeriodicFlush Flushing ${eventBuffer.size} events")
                         flusher.flush(eventBuffer)
                         eventBuffer.clear()
                     }
@@ -50,14 +54,19 @@ class AnalyticsTracker @Inject constructor(
     }
 
 
+    /**
+     * Logs an analytics event.
+     */
     override fun trackEvent(event: AnalyticsEvent) {
         scope.launch {
+            Log.d("AnalyticsTracker", "Event logged: $event")
             trackerMutex.withLock {
                 if (periodicFlushJob == null || !periodicFlushJob!!.isActive) {
                     startPeriodicFlush()
                 }
                 eventBuffer.add(event)
                 if (eventBuffer.size >= flushPolicy.maxEvents) {
+                    Log.d("AnalyticsTracker", "trackEvent Flushing ${eventBuffer.size} events")
                     flusher.flush(eventBuffer)
                     eventBuffer.clear()
                 }
@@ -65,7 +74,9 @@ class AnalyticsTracker @Inject constructor(
         }
     }
 
-
+    /**
+     * Shuts down the tracker.
+     */
     override fun shutdown() {
         scope.launch {
             trackerMutex.withLock {
@@ -79,6 +90,9 @@ class AnalyticsTracker @Inject constructor(
         }
     }
 
+    /**
+     * Flushes all events immediately.
+     */
     override suspend fun uploadFlushedEvents() {
         flusher.sendEvents()
     }

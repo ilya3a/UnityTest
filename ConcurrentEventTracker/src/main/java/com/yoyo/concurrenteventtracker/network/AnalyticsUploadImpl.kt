@@ -21,7 +21,9 @@ class AnalyticsUploadImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : AnalyticsApi {
 
-
+    /**
+     * Sends a list of analytics events to the server.
+     */
     override suspend fun send(events: List<AnalyticsEvent>): Boolean {
         if (events.isEmpty()) return true
 

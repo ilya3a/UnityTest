@@ -4,18 +4,16 @@ import android.util.Log
 import com.yoyo.concurrenteventtracker.data.db.AnalyticsEvent
 import com.yoyo.concurrenteventtracker.data.repository.AnalyticsRepository
 import com.yoyo.concurrenteventtracker.network.AnalyticsApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 
 /**
  * Handles observing event count and triggering flush when needed.
  */
 @Singleton
- class AnalyticsFlusher @Inject constructor(
+class AnalyticsFlusher @Inject constructor(
     private val repository: AnalyticsRepository,
     private val api: AnalyticsApi
 ) {
@@ -24,14 +22,14 @@ import javax.inject.Singleton
     private val flushMutex = Mutex()
 
     /**
-     * Flushes events to the server, deletes them if sent successfully.
+     * Sends events to the server, deletes them if sent successfully.
      */
     suspend fun sendEvents() {
-        Log.d(TAG, "Flushing events...${Thread.currentThread().name}")
+        Log.d(TAG, "Sending events...${Thread.currentThread().name}")
         flushMutex.withLock {
             val events: List<AnalyticsEvent> = repository.getEventsForFlush()
             if (events.isEmpty()) {
-                Log.d(TAG, "No events to flush")
+                Log.d(TAG, "No events to send")
                 return
             }
 
@@ -47,6 +45,9 @@ import javax.inject.Singleton
         }
     }
 
+    /**
+     * Flushes events to the DB.
+     */
     suspend fun flush(eventBuffer: MutableList<AnalyticsEvent>) {
         repository.logEvents(eventBuffer)
     }
