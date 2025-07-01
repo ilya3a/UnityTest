@@ -36,7 +36,7 @@ A lightweight event tracking library built with Kotlin, Room, Retrofit, and Hilt
 
 
 ### if i had more time:
-- obsificat all unnessesary code
+- ossification of all unnecessary code
 - AnalyticsEvent i will hide from the user and just collect values from him and construct the class in SDK
 
 ## 🚀 How to Run
