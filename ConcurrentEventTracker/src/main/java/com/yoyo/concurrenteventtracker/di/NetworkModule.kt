@@ -1,6 +1,7 @@
 package com.yoyo.concurrenteventtracker.di
 
 import android.content.Context
+import com.yoyo.concurrenteventtracker.BuildConfig
 import com.yoyo.concurrenteventtracker.network.AnalyticsApi
 import com.yoyo.concurrenteventtracker.network.AnalyticsUploadApi
 import com.yoyo.concurrenteventtracker.network.AnalyticsUploadImpl
@@ -42,7 +43,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.escuelajs.co/api/v1/")
+            .baseUrl(BuildConfig.UPLOAD_BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
