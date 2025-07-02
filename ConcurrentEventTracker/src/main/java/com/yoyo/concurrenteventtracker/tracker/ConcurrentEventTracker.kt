@@ -1,9 +1,10 @@
 package com.yoyo.concurrenteventtracker.tracker
 
 import com.yoyo.concurrenteventtracker.data.db.AnalyticsEvent
+import kotlinx.coroutines.Job
 
 interface ConcurrentEventTracker {
-    fun trackEvent(event: AnalyticsEvent)
-    fun shutdown()
+    suspend fun trackEvent(event: AnalyticsEvent)
+    suspend fun shutdown()
     suspend fun uploadFlushedEvents()
 }

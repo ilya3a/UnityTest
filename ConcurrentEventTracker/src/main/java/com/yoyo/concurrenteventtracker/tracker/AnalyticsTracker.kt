@@ -6,11 +6,14 @@ import com.yoyo.concurrenteventtracker.di.ApplicationScope
 import com.yoyo.concurrenteventtracker.flusher.AnalyticsFlusher
 import com.yoyo.concurrenteventtracker.flusher.FlushPolicy
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -54,19 +57,21 @@ class AnalyticsTracker @Inject constructor(
     }
 
 
+    // New: A thread-safe counter for pending operations
+    private val pendingOperations = AtomicInteger(0)
+
     /**
      * Logs an analytics event.
      */
-    override fun trackEvent(event: AnalyticsEvent) {
-        scope.launch {
-            Log.d("AnalyticsTracker", "Event logged: $event")
-            trackerMutex.withLock {
-                if (periodicFlushJob == null || !periodicFlushJob!!.isActive) {
-                    startPeriodicFlush()
-                }
-                eventBuffer.add(event)
-                if (eventBuffer.size >= flushPolicy.maxEvents) {
-                    Log.d("AnalyticsTracker", "trackEvent Flushing ${eventBuffer.size} events")
+    override suspend fun trackEvent(event: AnalyticsEvent) {
+        // Increment the counter immediately
+        Log.d("AnalyticsTracker", "Event logged: $event")
+        trackerMutex.withLock {
+            Log.d("AnalyticsTracker", "trackerMutex locked for ${event.name}")
+            eventBuffer.add(event)
+            if (eventBuffer.size >= flushPolicy.maxEvents) {
+                Log.d("AnalyticsTracker", "trackEvent Flushing ${eventBuffer.size} events")
+                withContext(IO) {
                     flusher.flush(eventBuffer)
                     eventBuffer.clear()
                 }
@@ -77,15 +82,13 @@ class AnalyticsTracker @Inject constructor(
     /**
      * Shuts down the tracker.
      */
-    override fun shutdown() {
-        scope.launch {
-            trackerMutex.withLock {
-                periodicFlushJob?.cancel()
-                Log.d("AnalyticsTracker", "Shutting down")
-                if (eventBuffer.isNotEmpty()) {
-                    flusher.flush(eventBuffer)
-                    eventBuffer.clear()
-                }
+    override suspend fun shutdown() {
+        trackerMutex.withLock {
+            periodicFlushJob?.cancel()
+            Log.d("AnalyticsTracker", "Shutting down")
+            if (eventBuffer.isNotEmpty()) {
+                flusher.flush(eventBuffer)
+                eventBuffer.clear()
             }
         }
     }
