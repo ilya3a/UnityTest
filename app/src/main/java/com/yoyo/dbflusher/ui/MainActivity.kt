@@ -12,7 +12,6 @@ import com.yoyo.concurrenteventtracker.tracker.AnalyticsTracker
 import com.yoyo.dbflusher.ui.theme.DBflusherTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -21,13 +20,15 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DBflusherTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    TestTrackerScreen(analyticsTracker,)
+                    TestTrackerScreen(analyticsTracker)
                 }
             }
         }

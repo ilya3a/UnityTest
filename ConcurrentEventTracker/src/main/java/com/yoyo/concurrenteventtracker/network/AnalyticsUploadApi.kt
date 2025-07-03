@@ -10,7 +10,7 @@ import retrofit2.http.Part
 import javax.inject.Singleton
 
 @Singleton
-interface AnalyticsUploadApi {
+internal interface AnalyticsUploadApi {
     @Multipart
     @POST(BuildConfig.UPLOAD_END_POINT)
     suspend fun uploadCompressedFile(

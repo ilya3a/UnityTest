@@ -9,8 +9,6 @@ import com.yoyo.concurrenteventtracker.data.repository.AnalyticsRepository
 import com.yoyo.concurrenteventtracker.flusher.AnalyticsFlusher
 import com.yoyo.concurrenteventtracker.network.AnalyticsApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After

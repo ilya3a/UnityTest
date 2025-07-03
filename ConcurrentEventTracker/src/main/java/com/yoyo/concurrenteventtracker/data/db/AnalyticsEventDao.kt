@@ -1,10 +1,12 @@
 package com.yoyo.concurrenteventtracker.data.db
 
-import androidx.room.*
-import kotlinx.coroutines.flow.Flow
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
 @Dao
-interface AnalyticsEventDao {
+internal interface AnalyticsEventDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(events: List<AnalyticsEvent>)

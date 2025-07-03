@@ -6,6 +6,6 @@ import androidx.room.TypeConverters
 
 @Database(entities = [AnalyticsEvent::class], version = 2)
 @TypeConverters(Converters::class)
-abstract class AppDatabase : RoomDatabase() {
+internal abstract class AppDatabase : RoomDatabase() {
     abstract fun analyticsEventDao(): AnalyticsEventDao
 }

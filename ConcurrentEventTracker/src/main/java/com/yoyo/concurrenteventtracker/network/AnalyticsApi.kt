@@ -5,7 +5,7 @@ import com.yoyo.concurrenteventtracker.data.db.AnalyticsEvent
 /**
  * Interface for sending analytics events to the remote server.
  */
-interface AnalyticsApi {
+internal interface AnalyticsApi {
 
     /**
      * Sends a list of events to the server.

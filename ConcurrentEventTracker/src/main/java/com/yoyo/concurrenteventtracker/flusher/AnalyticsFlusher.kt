@@ -13,7 +13,7 @@ import javax.inject.Singleton
  * Handles observing event count and triggering flush when needed.
  */
 @Singleton
-open  class AnalyticsFlusher @Inject constructor(
+internal open class AnalyticsFlusher @Inject constructor(
     private val repository: AnalyticsRepository,
     private val api: AnalyticsApi
 ) {

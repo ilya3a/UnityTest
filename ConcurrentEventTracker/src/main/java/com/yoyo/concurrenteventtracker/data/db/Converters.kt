@@ -3,7 +3,7 @@ package com.yoyo.concurrenteventtracker.data.db
 import androidx.room.TypeConverter
 import org.json.JSONObject
 
-class Converters {
+internal class Converters {
 
     @TypeConverter
     fun fromMap(value: Map<String, String>): String {

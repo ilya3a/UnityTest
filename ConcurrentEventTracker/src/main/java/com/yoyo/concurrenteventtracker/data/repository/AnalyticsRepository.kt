@@ -12,7 +12,7 @@ import javax.inject.Singleton
  * All access is protected with a Mutex to ensure thread safety.
  */
 @Singleton
-class AnalyticsRepository @Inject constructor(
+internal class AnalyticsRepository @Inject constructor(
     private val dao: AnalyticsEventDao
 ) {
     // Mutex to prevent concurrent write/read/flush operations

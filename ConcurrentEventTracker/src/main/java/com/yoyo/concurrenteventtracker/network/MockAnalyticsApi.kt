@@ -10,7 +10,7 @@ import javax.inject.Singleton
  * Fake implementation of AnalyticsApi that simulates success or failure.
  */
 @Singleton
-class MockAnalyticsApi @Inject constructor() : AnalyticsApi {
+internal class MockAnalyticsApi @Inject constructor() : AnalyticsApi {
 
     override suspend fun send(events: List<AnalyticsEvent>): Boolean {
         Log.d("AnalyticsApi", "Sending ${events.size} events to the server...")

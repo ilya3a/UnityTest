@@ -55,7 +55,6 @@ class AnalyticsTrackerTest {
         repeat(flushPolicy.maxEvents) {
             tracker.trackEvent(AnalyticsEvent(name = "e$it"))
         }
-        advanceUntilIdle()
         tracker.shutdown()
         Assert.assertEquals(1, flusher.flushCount)
         Assert.assertEquals(flushPolicy.maxEvents, repository.getEventsForFlush().size)

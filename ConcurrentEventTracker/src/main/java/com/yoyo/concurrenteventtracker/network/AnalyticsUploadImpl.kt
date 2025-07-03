@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AnalyticsUploadImpl @Inject constructor(
+internal class AnalyticsUploadImpl @Inject constructor(
     private val api: AnalyticsUploadApi,
     @param:ApplicationContext private val context: Context
 ) : AnalyticsApi {
