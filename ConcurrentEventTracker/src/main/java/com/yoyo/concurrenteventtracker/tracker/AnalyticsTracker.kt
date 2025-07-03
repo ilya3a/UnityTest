@@ -56,10 +56,6 @@ class AnalyticsTracker @Inject internal constructor(
         }
     }
 
-
-    // New: A thread-safe counter for pending operations
-    private val pendingOperations = AtomicInteger(0)
-
     /**
      * Logs an analytics event.
      */
