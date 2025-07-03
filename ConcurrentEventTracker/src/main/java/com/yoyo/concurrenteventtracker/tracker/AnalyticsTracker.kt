@@ -87,8 +87,11 @@ class AnalyticsTracker @Inject internal constructor(
             periodicFlushJob?.cancel()
             Log.d("AnalyticsTracker", "Shutting down")
             if (eventBuffer.isNotEmpty()) {
+                Log.d("AnalyticsTracker", "Flushing ${eventBuffer.size} remaining events")
                 flusher.flush(eventBuffer)
+                Log.d("AnalyticsTracker", "Flushing done")
                 eventBuffer.clear()
+                Log.d("AnalyticsTracker", "Buffer cleared")
             }
         }
     }
