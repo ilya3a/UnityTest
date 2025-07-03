@@ -7,9 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.yoyo.concurrenteventtracker.tracker.AnalyticsTracker
 import com.yoyo.dbflusher.ui.theme.DBflusherTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,6 +35,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        analyticsTracker.shutdown()
+        lifecycleScope.launch {
+            analyticsTracker.shutdown()
+        }
+
     }
 }

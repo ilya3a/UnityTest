@@ -45,12 +45,17 @@ fun TestTrackerScreen(
 
         Button(
             onClick = {
-                try {
-                    tracker.trackEvent(AnalyticsEvent(name = "TEST_EVENT"))
-                    message = "Event logged successfully"
-                } catch (t: Throwable) {
-                    message = t.message.toString()
+
+                coroutineScope.launch {
+                    try {
+                        tracker.trackEvent(AnalyticsEvent(name = "TEST_EVENT"))
+                        message = "Event logged successfully"
+                    } catch (t: Throwable) {
+                        message = t.message.toString()
+                    }
                 }
+
+
             }) {
             Text("Log Event")
         }
@@ -81,12 +86,15 @@ fun TestTrackerScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                try {
-                    tracker.shutdown()
-                } catch (t: Throwable) {
-                    message = t.message.toString()
+                coroutineScope.launch {
+                    try {
+                        tracker.shutdown()
+                    } catch (t: Throwable) {
+                        message = t.message.toString()
+                    }
                 }
             }
+
         ) {
             Text("ShutDown")
         }

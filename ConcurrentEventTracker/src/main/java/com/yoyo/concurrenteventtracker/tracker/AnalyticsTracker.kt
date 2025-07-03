@@ -26,7 +26,7 @@ class AnalyticsTracker @Inject constructor(
     private val flusher: AnalyticsFlusher,
     private val flushPolicy: FlushPolicy,
     @param:ApplicationScope private val scope: CoroutineScope
-) : ConcurrentEventTracker {
+)  {
 
     private var eventBuffer = mutableListOf<AnalyticsEvent>()
     private val trackerMutex = Mutex()
@@ -63,7 +63,7 @@ class AnalyticsTracker @Inject constructor(
     /**
      * Logs an analytics event.
      */
-    override suspend fun trackEvent(event: AnalyticsEvent) {
+     suspend fun trackEvent(event: AnalyticsEvent) {
         // Increment the counter immediately
         Log.d("AnalyticsTracker", "Event logged: $event")
         trackerMutex.withLock {
@@ -82,7 +82,7 @@ class AnalyticsTracker @Inject constructor(
     /**
      * Shuts down the tracker.
      */
-    override suspend fun shutdown() {
+     suspend fun shutdown() {
         trackerMutex.withLock {
             periodicFlushJob?.cancel()
             Log.d("AnalyticsTracker", "Shutting down")
@@ -96,7 +96,7 @@ class AnalyticsTracker @Inject constructor(
     /**
      * Flushes all events immediately.
      */
-    override suspend fun uploadFlushedEvents() {
+     suspend fun uploadFlushedEvents() {
         flusher.sendEvents()
     }
 
